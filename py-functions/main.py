@@ -1,31 +1,48 @@
 # main.py
 import time
 import json
+import socketio
+import sys
 from model import CovidModel
 
+# Inicializar socketio para comunicarse con el servidor Node.js
+sio = socketio.Client()
+
+# Conectarse al servidor Node.js en el puerto configurado (ejemplo: localhost:5000)
+sio.connect("http://localhost:3000")
+
+# Función para enviar datos al servidor
+def send_results_to_server(data):
+    sio.emit("simulation_update", data)
+
+# Leer la configuración desde el argumento
+if len(sys.argv) < 2:
+    raise ValueError("La configuración de la simulación no se proporcionó como argumento.")
+config = json.loads(sys.argv[1])
+
 # Configuración de parámetros de simulación
-config = {
-    "agents": 1000,
-    "infected": 5,
-    "distribution": {
-        "poblationalAge": { "neonatal": 0.05, "kid": 0.2, "young": 0.15, "adult": 0.35, "old": 0.2, "oldest": 0.05 },
-        "healthCondition": { "athetic": 0.2, "healthy": 0.4, "sedentary": 0.3, "comorbility": 0.1 },
-        "movility": { "restricted": 0.3, "constant": 0.4, "intermitent": 0.3 },
-        "atention": { "low": 0.2, "medium": 0.5, "high": 0.3 },
-        "wealthyDistribution": { "halfMinimumSalary": 0.4, "minimumSalary": 0.3, "twoMinimumSalary": 0.2, "threeMinimumSalary": 0.06,
-            "fiveMinimumSalary": 0.02, "tenMinimumSalary": 0.015, "moreThanTwelveMinimumSalary": 0.005 },
-        "profesionalActivity": { "healthProfesional": 0.05, "essentialProfesional": 0.2, "normalProfesional": 0.2, "student": 0.3,
-            "retired": 0.05, "inactive": 0.1, "domestic": 0.1 }
-    },
-    "ambientalParameters": {
-        "quarentine": True, "maskUse": True, "socialDistance": True
-    },
-    "contagiousPercentage": { "minimum": 0.15, "maximum": 0.45 },
-    "recoveryTime": { "minimum": 15, "maximum": 21 },
-    "inmunityTime": { "minimum": 30, "maximum": 60 },
-    "deathPercentage": { "minimum": 0.15, "maximum": 0.45 },
-    "simulation_time": 120,
-}
+# config = {
+#     "agents": 1000,
+#     "infected": 5,
+#     "distribution": {
+#         "poblationalAge": { "neonatal": 0.05, "kid": 0.2, "young": 0.15, "adult": 0.35, "old": 0.2, "oldest": 0.05 },
+#         "healthCondition": { "athetic": 0.2, "healthy": 0.4, "sedentary": 0.3, "comorbility": 0.1 },
+#         "movility": { "restricted": 0.3, "constant": 0.4, "intermitent": 0.3 },
+#         "atention": { "low": 0.2, "medium": 0.5, "high": 0.3 },
+#         "wealthyDistribution": { "halfMinimumSalary": 0.4, "minimumSalary": 0.3, "twoMinimumSalary": 0.2, "threeMinimumSalary": 0.06,
+#             "fiveMinimumSalary": 0.02, "tenMinimumSalary": 0.015, "moreThanTwelveMinimumSalary": 0.005 },
+#         "profesionalActivity": { "healthProfesional": 0.05, "essentialProfesional": 0.2, "normalProfesional": 0.2, "student": 0.3,
+#             "retired": 0.05, "inactive": 0.1, "domestic": 0.1 }
+#     },
+#     "ambientalParameters": {
+#         "quarentine": True, "maskUse": True, "socialDistance": True
+#     },
+#     "contagiousPercentage": { "minimum": 0.15, "maximum": 0.45 },
+#     "recoveryTime": { "minimum": 15, "maximum": 21 },
+#     "inmunityTime": { "minimum": 30, "maximum": 60 },
+#     "deathPercentage": { "minimum": 0.15, "maximum": 0.45 },
+#     "simulation_time": 120,
+# }
 
 # Inicialización y ejecución del modelo
 model = CovidModel(config)
@@ -48,6 +65,9 @@ while time.time() - start_time < config["simulation_time"]:
         "susceptible": model.count_state("Susceptible"),
         "recovered": model.count_state("Recovered")
     }
+
+    # Enviar los resultados al servidor Node.js
+    send_results_to_server(state_counts)
 
     # Imprimir los resultados en formato JSON
     print(json.dumps(state_counts, indent=4))
@@ -72,6 +92,8 @@ state_counts_final = {
 
 # Imprimir los resultados en formato JSON
 print(json.dumps(state_counts_final, indent=4))
+# Enviar los resultados al servidor Node.js
+send_results_to_server(state_counts_final)
 final_results = model.get_results()
 array_results = []
 for result in final_results[-1]:

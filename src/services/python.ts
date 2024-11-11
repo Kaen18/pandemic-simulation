@@ -1,26 +1,23 @@
-// /backend/services/PythonService.ts
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 
 export class PythonService {
-  // Este método ejecuta el script Python y obtiene el resultado
-  executePythonScript(): Promise<string> {
-    return new Promise((resolve, reject) => {
-      exec('python ./py-functions/data_provider.py', (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Error ejecutando script: ${error}`);
-          reject(error);
-          return;
-        }
+  // Este método ejecuta el script Python de manera asíncrona
+  executePythonScript(config: any): void {
+    const configStr = JSON.stringify(config);
 
-        if (stderr) {
-          console.error(`Error en Python: ${stderr}`);
-          reject(stderr);
-          return;
-        }
+    // Ejecuta el proceso en segundo plano sin esperar respuesta
+    const pythonProcess = spawn('python3.11', ['./py-functions/main.py', configStr]);
 
-        // stdout contiene el resultado del script Python
-        resolve(stdout);
-      });
+    pythonProcess.stdout.on('data', (data) => {
+      console.log(`Salida del script Python: ${data.toString()}`);
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
+      console.error(`Error en Python: ${data.toString()}`);
+    });
+
+    pythonProcess.on('close', (code) => {
+      console.log(`El proceso de Python terminó con el código: ${code}`);
     });
   }
 }
