@@ -3,6 +3,8 @@ import { start } from "../controller/pandemia";
 
 const router = Router();
 
-router.get("/start", start);
+router.post("/start", start);
+
+
 
 export { router };
