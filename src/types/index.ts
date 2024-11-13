@@ -13,6 +13,7 @@ import {
 } from './simulation';
 import { ApiError } from './error';
 import { ApiResponse } from './response';
+import { Totalizer } from './totalizer';
 
 export {
     SimulationConfig,
@@ -28,4 +29,5 @@ export {
     RangeTime,
     ApiError,
     ApiResponse,
+    Totalizer,
 };

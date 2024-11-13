@@ -1,5 +1,6 @@
 // socketConfig.ts
 import { Server as SocketIOServer, Socket } from "socket.io";
+import { newCicle } from "../services";
 
 // Configuración de eventos para el socket
 export function setupSocket(io: SocketIOServer) {
@@ -7,13 +8,20 @@ export function setupSocket(io: SocketIOServer) {
         console.log("Cliente conectado");
 
         // Escucha el evento "simulation_update" desde el cliente
-        socket.on("simulation_update", (data) => {
-            console.log("Actualización de simulación recibida:", data);
-            // Aquí puedes procesar o almacenar los datos recibidos
+        socket.on("newCicle", async (result) => {
+            try {
+                console.log("newCicle on", result);
+                // Llama a la función newCicle del servicio sockets
+                await newCicle(result, socket);
+            } catch (error) {
+                console.error(error);
+            }
         });
 
         socket.on("disconnect", () => {
             console.log("Cliente desconectado");
         });
+
+
     });
 }

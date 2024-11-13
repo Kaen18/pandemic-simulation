@@ -13,7 +13,7 @@ sio.connect("http://localhost:3000")
 
 # Función para enviar datos al servidor
 def send_results_to_server(data):
-    sio.emit("simulation_update", data)
+    sio.emit("newCicle", data)
 
 # Leer la configuración desde el argumento
 if len(sys.argv) < 2:
@@ -59,9 +59,9 @@ while time.time() - start_time < config["simulation_time"]:
 
     # Recolectar y mostrar los resultados en formato JSON
     state_counts = {
-        "infected": model.count_state("Infectious"),
-        "exposed": model.count_state("Exposed"),
-        "deceased": model.count_state("Deceased"),
+        "sick": model.count_state("Infectious"),
+        "healthy": model.count_state("Exposed"),
+        "dead": model.count_state("Deceased"),
         "susceptible": model.count_state("Susceptible"),
         "recovered": model.count_state("Recovered")
     }
@@ -74,18 +74,18 @@ while time.time() - start_time < config["simulation_time"]:
 
     # Verificar si toda la población ha muerto o se ha recuperado
     total_agents = config["agents"]
-    if state_counts["deceased"] == total_agents or state_counts["recovered"] == total_agents:
+    if state_counts["dead"] == total_agents or state_counts["recovered"] == total_agents:
         print("La simulación ha terminado porque todos los agentes han muerto o se han recuperado.")
         break
 
-    time.sleep(1)
+    # time.sleep(1)
 
 # Resultados finales de la simulación
 print("\n--- Resultados finales de la simulación ---")
 state_counts_final = {
-        "infected": model.count_state("Infectious"),
-        "exposed": model.count_state("Exposed"),
-        "deceased": model.count_state("Deceased"),
+        "sick": model.count_state("Infectious"),
+        "healthy": model.count_state("Exposed"),
+        "dead": model.count_state("Deceased"),
         "susceptible": model.count_state("Susceptible"),
         "recovered": model.count_state("Recovered")
     }
