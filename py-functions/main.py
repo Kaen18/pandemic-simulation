@@ -46,6 +46,8 @@ config = json.loads(sys.argv[1])
 
 # Inicialización y ejecución del modelo
 model = CovidModel(config)
+  
+# agregar socket on
 
 # Tiempo de inicio de la simulación
 start_time = time.time()
