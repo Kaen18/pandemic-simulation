@@ -27,7 +27,7 @@ class CovidModel:
         """Realiza un ciclo de simulación, actualizando el estado de los agentes."""
         for agent in self.agents:
             agent.move()
-            agent.update_state()
+            agent.update_state(self.agents)
 
         self.history.append([agent.get_state() for agent in self.agents])
 
