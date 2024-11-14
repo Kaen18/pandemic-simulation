@@ -1,3 +1,4 @@
+import { io } from "../config/socket";
 import { AmbientalParameters, SimulationConfig } from "../types";
 import { PythonService } from "./python";
 
@@ -79,6 +80,10 @@ export default class PandemiaService {
         const result = pythonService.executePythonScript(data);
 
         return result;
+    }
+
+    public pause(): void {
+        io?.emit('pause_simulation');
     }
 
     private manageParameters(data: SimulationConfig): any {

@@ -15,7 +15,7 @@ app.use(
 app.use(express.json())
 app.use(router);
 const server = createServer(app);
-const io = new SocketIOServer(server);
+//const io = new SocketIOServer(server);
 // Configura el socket utilizando la función importada
-setupSocket(io);
+setupSocket(server);
 server.listen(PORT, () => console.log(`Listen in port ${PORT}`));

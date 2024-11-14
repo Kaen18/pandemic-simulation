@@ -2,8 +2,14 @@
 import { Server as SocketIOServer, Socket } from "socket.io";
 import { newCicle } from "../services";
 
-// Configuración de eventos para el socket
-export function setupSocket(io: SocketIOServer) {
+// Exporta una variable `io` que contendrá la instancia del socket
+export let io: SocketIOServer | null = null;
+
+// Función para inicializar y configurar el socket
+export function setupSocket(server: any) {
+    // Inicializa el servidor de socket
+    io = new SocketIOServer(server);
+
     io.on("connection", (socket: Socket) => {
         console.log("Cliente conectado");
 
@@ -21,7 +27,5 @@ export function setupSocket(io: SocketIOServer) {
         socket.on("disconnect", () => {
             console.log("Cliente desconectado");
         });
-
-
     });
 }
