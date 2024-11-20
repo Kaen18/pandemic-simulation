@@ -59,6 +59,7 @@ model = CovidModel(config)
 def on_pause_simulation():
     global is_paused, remaining_time
     is_paused = not is_paused
+    print(f"La simulación ha sido {'pausada' if is_paused else 'reanudada'}.")
     if is_paused:
         remaining_time = config["simulation_time"] - (time.time() - start_time)
     else:

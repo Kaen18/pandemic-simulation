@@ -83,6 +83,7 @@ export default class PandemiaService {
     }
 
     public pause(): void {
+        console.log('Pausando o activando simulación');
         io?.emit('pause_simulation');
     }
 
