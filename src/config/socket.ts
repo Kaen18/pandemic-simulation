@@ -8,24 +8,31 @@ export let io: SocketIOServer | null = null;
 // Función para inicializar y configurar el socket
 export function setupSocket(server: any) {
     // Inicializa el servidor de socket
-    io = new SocketIOServer(server);
-
-    io.on("connection", (socket: Socket) => {
-        console.log("Cliente conectado");
-
-        // Escucha el evento "simulation_update" desde el cliente
-        socket.on("newCicle", async (result) => {
-            try {
-                console.log("newCicle on", result);
-                // Llama a la función newCicle del servicio sockets
-                await newCicle(result, socket);
-            } catch (error) {
-                console.error(error);
-            }
-        });
-
-        socket.on("disconnect", () => {
-            console.log("Cliente desconectado");
-        });
+    io = new SocketIOServer(server, {
+        cors: {
+            origin: "*", // Permitir todas las orígenes
+            methods: ["GET", "POST"], // Métodos permitidos
+            allowedHeaders: ["my-custom-header"], // Encabezados permitidos
+            credentials: true // Permitir credenciales
+        }
     });
+
+io.on("connection", (socket: Socket) => {
+    console.log("Cliente conectado");
+
+    // Escucha el evento "simulation_update" desde el cliente
+    socket.on("newCicle", async (result) => {
+        try {
+            console.log("newCicle on", result);
+            // Llama a la función newCicle del servicio sockets
+            await newCicle(result, socket);
+        } catch (error) {
+            console.error(error);
+        }
+    });
+
+    socket.on("disconnect", () => {
+        console.log("Cliente desconectado");
+    });
+});
 }

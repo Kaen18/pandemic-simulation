@@ -76,6 +76,8 @@ import { PythonService } from "./python";
 
 export default class PandemiaService {
     public start(data: SimulationConfig): any {
+        console.log('Iniciando simulación');
+        console.log('Data', data);
         const pythonService = new PythonService();
         const result = pythonService.executePythonScript(data);
 
