@@ -11,6 +11,11 @@ sio = socketio.Client()
 # Conectarse al servidor Node.js en el puerto configurado (ejemplo: localhost:5000)
 sio.connect("http://localhost:3000")
 
+# Estado de la simulación
+is_paused = False
+remaining_time = None  # Para guardar el tiempo restante cuando se pausa
+start_time = None
+
 # Función para enviar datos al servidor
 def send_results_to_server(data):
     sio.emit("newCicle", data)
@@ -49,11 +54,29 @@ model = CovidModel(config)
   
 # agregar socket on
 
+# Evento para pausar la simulación
+@sio.on("pause_simulation")
+def on_pause_simulation():
+    global is_paused, remaining_time
+    is_paused = not is_paused
+    print(f"La simulación ha sido {'pausada' if is_paused else 'reanudada'}.")
+    if is_paused:
+        remaining_time = config["simulation_time"] - (time.time() - start_time)
+    else:
+        # Ajustar el tiempo de inicio para continuar donde quedó
+        config["simulation_time"] = remaining_time
+        remaining_time = None
+
 # Tiempo de inicio de la simulación
 start_time = time.time()
 
 # Ejecutar simulación hasta alcanzar el tiempo configurado o hasta que todos los agentes mueran o se recuperen
 while time.time() - start_time < config["simulation_time"]:
+    if is_paused:
+        # Pausar el ciclo si la simulación está en pausa
+        time.sleep(1)
+        continue
+
     elapsed_time = time.time() - start_time
     step = int(elapsed_time)  # Calcular el número de ciclos transcurridos
     print(f"\n--- Ciclo de simulación {step + 1} ---")
@@ -80,7 +103,7 @@ while time.time() - start_time < config["simulation_time"]:
         print("La simulación ha terminado porque todos los agentes han muerto o se han recuperado.")
         break
 
-    # time.sleep(1)
+    time.sleep(1)
 
 # Resultados finales de la simulación
 print("\n--- Resultados finales de la simulación ---")

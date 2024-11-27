@@ -13,6 +13,6 @@ export const newCicle = async (result: any, socket: Socket): Promise<void> => {
 
 // Private functions
 const _sendMockupSocket = (socket: Socket, result: Totalizer) => {
-    socket.broadcast.emit('newCycle', result)
+    socket.broadcast.emit('newCycleFront', result)
 }
 
